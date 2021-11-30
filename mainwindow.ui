@@ -25,23 +25,9 @@
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QPushButton" name="stepButton">
-       <property name="text">
-        <string>Step</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="playButton">
        <property name="text">
         <string>Play</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pauseButton">
-       <property name="text">
-        <string>Pause</string>
        </property>
       </widget>
      </item>
@@ -50,15 +36,18 @@
    <widget class="QWidget" name="verticalLayoutWidget_2">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>9</y>
+      <x>20</x>
+      <y>0</y>
       <width>181</width>
-      <height>42</height>
+      <height>76</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
       <widget class="QLabel" name="label">
+       <property name="autoFillBackground">
+        <bool>true</bool>
+       </property>
        <property name="text">
         <string>Player Health:</string>
        </property>
@@ -66,6 +55,9 @@
      </item>
      <item>
       <widget class="QLabel" name="label_2">
+       <property name="autoFillBackground">
+        <bool>true</bool>
+       </property>
        <property name="text">
         <string>Player Score:</string>
        </property>
@@ -99,10 +91,10 @@
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>320</x>
-      <y>40</y>
-      <width>151</width>
-      <height>20</height>
+      <x>230</x>
+      <y>9</y>
+      <width>371</width>
+      <height>51</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -112,7 +104,13 @@
      <number>3</number>
     </property>
     <property name="text">
-     <string>King Game</string>
+     <string>                                   King Game</string>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+    <property name="wordWrap">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QToolButton" name="toolButton">
