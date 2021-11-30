@@ -42,7 +42,7 @@ public:
     int population_; // population counter
 
     // timer
-    void initTimer();
+
     void changeInterval(int t);
 
     void updateGraph();
@@ -51,13 +51,19 @@ public:
 private slots: // slots for buttons on UI
 
     void on_playButton_click(); //slot for play game button
-    void on_pauseButton_click(); //slot for pause game button
-    void on_stepButton_click(); // slot to preform actions when step button is clicked
     void on_restartButton_click(); // restarts game (One of our additional features)
 
     void clickCellSlot(game * cell); // slot for mouse press events (clicking cells on UI)
 
 
+        //Buttons for movement
+    void on_toolButton_clicked();
+
+    void on_toolButton_2_clicked();
+
+    void on_toolButton_4_clicked();
+
+    void on_toolButton_3_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -71,7 +77,7 @@ private:
     int turnCounter_ = 0;
     QTimer *timer;
 
-    game * cells[10][20];
+    game * cells[10][10];
     std::vector <Bar*> popBar_;
     Bar * prev_bar_;
 
