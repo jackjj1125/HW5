@@ -244,3 +244,23 @@ void MainWindow::right_button_clicked() //slot for moving player right
     movePlayer(4);
 }
 
+
+void MainWindow::on_actionOpen_Rules_triggered()
+{
+    QTextEdit* Rules= new QTextEdit();
+    Rules->setWindowFlags(Qt::Window);
+    Rules->setReadOnly(true);
+    Rules->append("These are the rules for the game.");
+    Rules->show();
+}
+
+
+void MainWindow::on_pushButton_clicked()
+{
+    QTextEdit* Rules= new QTextEdit();
+    Rules->setWindowFlags(Qt::Window);
+    Rules->setReadOnly(true);
+    Rules->append("King Game: The objective of this game is to navigate the map, aquire power ups to make your character more powerful, and defeat any enemies you encounter on the way.To win the game, a player must defeat all the enemies on the gameboard while navigating the obstacles on the map. Once this is complete, the player becomes the new King.");
+    Rules->show();
+}
+
