@@ -6,6 +6,7 @@
 #include <QGraphicsView>
 #include <vector>
 #include "game.h"
+#include <QTextEdit>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -21,12 +22,14 @@ public:
 
     void createGameGrid();
 
-    void makeCastle(QColor color);
+    void makeNuke(QColor color);
     void makeBridge(QColor color);
     void makeRiver();
     void makeTree(int i, int j);
     void makeRock(int i, int j);
     void makeEnemy(int i, int j);
+
+    void nukeGame();
 
     void setPlayer(int x, int y, QColor color);
     void updatePlayerPositionToFalse(int x, int y, QColor color);
@@ -46,6 +49,10 @@ private slots: // slots for buttons on UI
     void left_button_clicked();
 
     void right_button_clicked();
+
+    void on_actionOpen_Rules_triggered();
+
+    void on_pushButton_clicked();
 
 private:
     Ui::MainWindow *ui;
