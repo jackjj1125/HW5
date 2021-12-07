@@ -6,18 +6,16 @@
 #include <QObject>
 #include <QGraphicsView>
 #include <QGraphicsItem>
-
 #include <QColor>
 #include <QGraphicsItem>
+#include "player.h"
 
 class game: public QObject, public QGraphicsItem
 {
-
     Q_OBJECT
 
 public:
     game(int x, int y, int width, int height, QColor c); //constructor
-
 
     QRectF boundingRect() const override;
     QPainterPath shape() const override;
@@ -31,73 +29,63 @@ public:
     int get_width() {return width_;}; //getter for cell width
     int get_height() {return height_;};
 
-    int get_status() {return is_alive;}; //getter for status of cell(alive or dead)
-    int get_neighborStatus(); //getter for status of cell's neighbor
-    int get_nextStatus()  {return next_turn;};
-
-    void set_status(bool status) {is_alive = status;}; //setter for status of cell
-    void set_NeighborStatus(); //setter for status of neighbor
-    void set_nextStatus(int next_turn_) {next_turn = next_turn_;}; //sets status for next turn
-
     QColor get_color() { return color_; }; //getter for color of cell
     void set_Color(QColor color) { color_ = color; }; //setter for color of cell(handles color logic)
 
-    // methods to kill or revive cells called every step of the game
-    void kill();
-    void revive(QColor newGameColor);
+    void set_player_status(bool status) { is_player_ = status; };
+    bool get_player_status() { return is_player_; };
+
+    void set_obstical(bool status){ is_obstical_ = status; };
+    bool get_obstical_status(){ return is_obstical_; };
+
+    void set_castle(bool c) { is_castle_ = c; };
+    void set_bridge_status(bool s) { is_bridge_ = s; };
 
 
+    void set_enemy(bool e){is_enemy_ = e;};
 
-    // signals for preforming game logic
-    signals:
-        void reviveCell(game * cell);
-        void killCell(game * cell);
-        void neighbors(int x, int y);
+    void resetPrevCell();
+    void movePlayerUp(Player * p);
+    void movePlayerDown(Player * p);
+    void movePlayerLeft(Player * p);
+    void movePlayerRight(Player * p);
 
+// signals for preforming game logic
+signals:
+    void moveUp(game * item);
+    void moveDown(game * item);
+    void moveLeft(game * item);
+    void moveRight(game * item);
+    void resetPrevSignal(game * item);
 
 protected:
-        // overridden mousePressEvent to handle user interaction with cells
+    // overridden mousePressEvent to handle user interaction with cells
     void mousePressEvent(QGraphicsSceneMouseEvent * event) override;
 
 private:
-    // cell fields
     int x_;
     int y_;
     int width_;
     int height_;
-    bool is_alive;
-    int next_turn;
     QColor color_;
-};
+
+    bool is_player_;
+
+    // for obstical cells
+    bool is_obstical_;
+
+    // for structures
+    bool is_castle_;
+    bool is_bridge_;
+
+    //for enemies
+    bool is_enemy_;
 
 
-// bar graph to track population
-class Bar: public QObject, public QGraphicsItem //bar class
-{
-    Q_OBJECT;
-
-public:
-    Bar(int x, int y, int h,  QColor color); //constructor
-
-    QRectF boundingRect() const override;
-    QPainterPath shape() const override;
-
-    static int get_width() {return width_; }; //getter for width
-    double getHeight() { return height_; };
-
-    int get_x() {return x_; }; //getter for x
-    void set_x(int s) {x_ = x_ + s; }; //setter for x
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *item, QWidget *widget) override;
-
-    void setBarColor(QColor color);
-
-private:
-    int x_;
-    int y_;
-    static const int width_ = 30; //width for bars is const
-    double height_;
-
-    QColor color_; //color for bar
 };
 
 #endif // GAME_H
+
+
+
+
