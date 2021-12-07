@@ -2,6 +2,7 @@
 #include <QGraphicsView>
 #include <QtWidgets>
 #include <vector>
+#include <QPixmap>
 
 #include "mainwindow.h"
 #include "game.h"
@@ -14,10 +15,10 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     QColor color(255,255,255);
-    QColor river(0,200,255);
-    QColor tree(0,200,13);
+    QColor river(0,200,255); //blue
+    QColor tree(0,200,13); //green
     QColor rock(40,80,100);
-    QColor enemy(250,0,0);
+    QColor enemy(250,0,0); //red
     newGameColor_ = color;
     river_color_ = river;
     tree_color_ = tree;
@@ -88,7 +89,7 @@ void MainWindow::createGameGrid(){
                     makeTree(i, j);
                 }
                 if(rn == 2){
-                    qDebug() << "Random Tree Added!";
+                    qDebug() << "Random Rock Added!";
                     makeRock(i, j);
                 }
                 if(rn == 2)
@@ -103,9 +104,9 @@ void MainWindow::createGameGrid(){
 
     // make structures
     QColor bridge(100,100,100);
-    QColor castle(40,40,40);
+    QColor nuke(250,250,0); //yellow
     makeRiver();
-    makeCastle(castle);
+    makeNuke(nuke);
     makeBridge(bridge);
 
 
@@ -116,7 +117,9 @@ void MainWindow::createGameGrid(){
 void MainWindow::makeEnemy(int i, int j)
 {
     cells[i][j]->set_Color(enemy_color_);
-    cells[i][j]->set_obstical(true);
+    cells[i][j]->set_enemy(true);
+//    QPixmap pic("/path/to/your/image");
+//    ui->gameGraphicsView->setPixmap(pic);
 }
     //-------------------
 
@@ -125,10 +128,11 @@ void MainWindow::setPlayer(int x, int y, QColor color){
     cells[y][x]->set_player_status(true);
     cells[y][x]->set_Color(color);
 }
-
-void MainWindow::makeCastle(QColor color){
+        //nuke
+void MainWindow::makeNuke(QColor color){ //one nuke on map ends game
     cells[0][1]->set_Color(color);
-    cells[0][1]->set_castle(true);
+    cells[0][1]->set_Nuke(true);
+
 }
 
 void MainWindow::makeBridge(QColor color){
@@ -163,6 +167,15 @@ void MainWindow::makeRock(int i, int j){
     cells[i][j]->set_obstical(true);
 }
 
+void MainWindow::nukeGame() //ends the game if player lands on nuke
+{
+    QTextEdit* GameEndsByNuke= new QTextEdit();
+    GameEndsByNuke->setWindowFlags(Qt::Window);
+    GameEndsByNuke->setReadOnly(true);
+    GameEndsByNuke->append("Congratulations! You have won the game by way of Nuclear Bomb!");
+    GameEndsByNuke->show();
+}
+
 void MainWindow::movePlayer(int option){
     int i = p1_->get_pos_y();
     int j = p1_->get_pos_x();
@@ -171,6 +184,10 @@ void MainWindow::movePlayer(int option){
         if(i != 0 && !cells[i-1][j]->get_obstical_status()){
             cells[i-1][j]->movePlayerUp(p1_);
             cells[i][j]->resetPrevCell();
+               if(cells[i][j]->get_nuke()) //if we land on nuke
+                {
+                    nukeGame();
+                }
         }
         else{
             qDebug() << "Cannot move here!";
@@ -180,6 +197,10 @@ void MainWindow::movePlayer(int option){
         if(i != 19 && !cells[i+1][j]->get_obstical_status()){
             cells[i+1][j]->movePlayerDown(p1_);
             cells[i][j]->resetPrevCell();
+            if(cells[i][j]->get_nuke()) //if we land on nuke
+             {
+                 nukeGame();
+             }
         }
         else{
             qDebug() << "Cannot move here!";
@@ -189,6 +210,10 @@ void MainWindow::movePlayer(int option){
         if(j != 0 && !cells[i][j-1]->get_obstical_status()){
             cells[i][j-1]->movePlayerLeft(p1_);
             cells[i][j]->resetPrevCell();
+            if(cells[i][j]->get_nuke()) //if we land on nuke
+             {
+                 nukeGame();
+             }
         }
         else{
             qDebug() << "Cannot move here!";
@@ -198,6 +223,10 @@ void MainWindow::movePlayer(int option){
         if(j != 19 && !cells[i][j+1]->get_obstical_status()){
             cells[i][j+1]->movePlayerRight(p1_);
             cells[i][j]->resetPrevCell();
+            if(cells[i][j]->get_nuke()) //if we land on nuke
+             {
+                 nukeGame();
+             }
         }
         else{
             qDebug() << "Cannot move here!";
