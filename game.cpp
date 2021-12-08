@@ -15,7 +15,9 @@ game::game(int x, int y, int width, int height, QColor color){
     is_obstical_ = false;
     is_castle_ = false;
     is_bridge_ = false;
+
     is_enemy_ = false;
+
     is_player_ = false;
 
 }

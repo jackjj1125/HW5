@@ -185,6 +185,7 @@
      <string>Attack</string>
     </property>
    </widget>
+
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>

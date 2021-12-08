@@ -42,7 +42,9 @@ public:
     void set_bridge_status(bool s) { is_bridge_ = s; };
 
 
+
     void set_enemy(bool e){is_enemy_ = e;};
+
 
     void resetPrevCell();
     void movePlayerUp(Player * p);
@@ -78,8 +80,10 @@ private:
     bool is_castle_;
     bool is_bridge_;
 
+
     //for enemies
     bool is_enemy_;
+
 
 
 };

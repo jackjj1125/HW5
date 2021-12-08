@@ -2,7 +2,9 @@
 #include <QGraphicsView>
 #include <QtWidgets>
 #include <vector>
+
 #include <QPixmap>
+
 
 #include "mainwindow.h"
 #include "game.h"
@@ -15,15 +17,19 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     QColor color(255,255,255);
+
     QColor river(0,200,255); //blue
     QColor tree(0,200,13); //green
     QColor rock(40,80,100);
     QColor enemy(250,0,0); //red
+
     newGameColor_ = color;
     river_color_ = river;
     tree_color_ = tree;
     rock_color_ = rock;
+
     enemy_color_ = enemy;
+
     // randomize tree and rock
     srand(time(0));
     createGameGrid();
@@ -123,15 +129,16 @@ void MainWindow::makeEnemy(int i, int j)
 }
     //-------------------
 
-
 void MainWindow::setPlayer(int x, int y, QColor color){
     cells[y][x]->set_player_status(true);
     cells[y][x]->set_Color(color);
 }
+
         //nuke
 void MainWindow::makeNuke(QColor color){ //one nuke on map ends game
     cells[0][1]->set_Color(color);
     cells[0][1]->set_Nuke(true);
+
 
 }
 
@@ -167,6 +174,7 @@ void MainWindow::makeRock(int i, int j){
     cells[i][j]->set_obstical(true);
 }
 
+
 void MainWindow::nukeGame() //ends the game if player lands on nuke
 {
     QTextEdit* GameEndsByNuke= new QTextEdit();
@@ -188,6 +196,7 @@ void MainWindow::movePlayer(int option){
                 {
                     nukeGame();
                 }
+
         }
         else{
             qDebug() << "Cannot move here!";
@@ -201,6 +210,7 @@ void MainWindow::movePlayer(int option){
              {
                  nukeGame();
              }
+
         }
         else{
             qDebug() << "Cannot move here!";
@@ -214,6 +224,7 @@ void MainWindow::movePlayer(int option){
              {
                  nukeGame();
              }
+
         }
         else{
             qDebug() << "Cannot move here!";
@@ -223,6 +234,7 @@ void MainWindow::movePlayer(int option){
         if(j != 19 && !cells[i][j+1]->get_obstical_status()){
             cells[i][j+1]->movePlayerRight(p1_);
             cells[i][j]->resetPrevCell();
+
             if(cells[i][j]->get_nuke()) //if we land on nuke
              {
                  nukeGame();
@@ -272,7 +284,6 @@ void MainWindow::right_button_clicked() //slot for moving player right
     qDebug() << "Move right";
     movePlayer(4);
 }
-
 
 void MainWindow::on_actionOpen_Rules_triggered()
 {
