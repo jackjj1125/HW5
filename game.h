@@ -38,12 +38,24 @@ public:
     void set_obstical(bool status){ is_obstical_ = status; };
     bool get_obstical_status(){ return is_obstical_; };
 
-    void set_castle(bool c) { is_castle_ = c; };
+    void set_enemy(bool status){is_enemy_ = status;};
+    bool get_enemy_status(){return is_enemy_;};
+
+    void set_Nuke(bool n) { is_nuke_ = n; };
+    bool get_nuke(){return is_nuke_;};
+
+    void set_attackPowerUp(bool a) {is_ATK_ = a;};
+    bool get_atkPowerUp(){return is_ATK_;};
+
+    void set_HealthPowerUp(bool h){is_HEALTH_ = h;};
+    bool get_HealthPowerUp(){return is_HEALTH_;};
+
+    void set_PtsPowerUp(bool p){is_PTS_ = p;};
+    bool get_PtsPowerUp(){return is_PTS_;};
+
+
+
     void set_bridge_status(bool s) { is_bridge_ = s; };
-
-
-
-    void set_enemy(bool e){is_enemy_ = e;};
 
 
     void resetPrevCell();
@@ -77,13 +89,14 @@ private:
     bool is_obstical_;
 
     // for structures
-    bool is_castle_;
+    bool is_nuke_;
     bool is_bridge_;
-
+    bool is_ATK_;
+    bool is_HEALTH_;
+    bool is_PTS_;
 
     //for enemies
     bool is_enemy_;
-
 
 
 };
