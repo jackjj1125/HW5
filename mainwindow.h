@@ -8,7 +8,6 @@
 #include "game.h"
 #include <QTextEdit>
 
-
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -23,18 +22,17 @@ public:
 
     void createGameGrid();
 
-
     void makeNuke(QColor color);
-
     void makeBridge(QColor color);
     void makeRiver();
     void makeTree(int i, int j);
     void makeRock(int i, int j);
-
     void makeEnemy(int i, int j);
+    void makeAttackPowerUp(QColor color);
+    void makeHealthPowerUp(QColor color);
+    void makePointsPowerUp(QColor color);
 
     void nukeGame();
-
 
     void setPlayer(int x, int y, QColor color);
     void updatePlayerPositionToFalse(int x, int y, QColor color);
@@ -81,8 +79,6 @@ private:
     QColor river_color_;
     QColor rock_color_;
     QColor tree_color_;
-
     QColor enemy_color_;
-
 };
 #endif // MAINWINDOW_H
