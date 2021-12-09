@@ -13,12 +13,13 @@ game::game(int x, int y, int width, int height, QColor color){
     width_ = width;
     height_ = height;
     is_obstical_ = false;
-    is_castle_ = false;
+    is_nuke_ = false;
     is_bridge_ = false;
-
     is_enemy_ = false;
-
     is_player_ = false;
+    is_ATK_ = false;
+    is_HEALTH_ = false;
+    is_PTS_ = false;
 
 }
 
@@ -42,6 +43,8 @@ void game::paint(QPainter *painter, const QStyleOptionGraphicsItem *item, QWidge
 void game::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 
 }
+
+
 
 void game::resetPrevCell(){
     this->set_player_status(false);
