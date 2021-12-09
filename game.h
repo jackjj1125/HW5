@@ -9,6 +9,7 @@
 #include <QColor>
 #include <QGraphicsItem>
 #include "player.h"
+#include "enemy.h"
 
 class game: public QObject, public QGraphicsItem
 {
@@ -39,13 +40,25 @@ public:
     bool get_obstical_status(){ return is_obstical_; };
 
     void set_castle(bool c) { is_castle_ = c; };
+    bool get_castle() { return is_castle_; };
     void set_bridge_status(bool s) { is_bridge_ = s; };
+
+
+
+    void set_enemy(bool e, Enemy *enemy){ is_enemy_ = e; enemy_ = enemy; };
+    bool get_enemy() { return is_enemy_; };
+    Enemy *getEnemyObject() { return enemy_; };
+
+    void sendMessage();
 
     void resetPrevCell();
     void movePlayerUp(Player * p);
     void movePlayerDown(Player * p);
     void movePlayerLeft(Player * p);
     void movePlayerRight(Player * p);
+    void attackEnemy(Enemy * e);
+    void attackPlayer(Player * p, int h);
+    void removeDefeatedEnemy();
 
 // signals for preforming game logic
 signals:
@@ -54,6 +67,11 @@ signals:
     void moveLeft(game * item);
     void moveRight(game * item);
     void resetPrevSignal(game * item);
+
+    void attackSignal(game * item); // emitted when enemy attacks
+    void removeEnemySignal(game * item);
+    void messageSignal(game * item);
+
 
 protected:
     // overridden mousePressEvent to handle user interaction with cells
@@ -74,6 +92,12 @@ private:
     // for structures
     bool is_castle_;
     bool is_bridge_;
+
+
+    //for enemies
+    bool is_enemy_;
+    Enemy *enemy_;
+
 
 
 };
