@@ -2,9 +2,7 @@
 #include <QGraphicsView>
 #include <QtWidgets>
 #include <vector>
-
 #include <QPixmap>
-
 
 #include "mainwindow.h"
 #include "game.h"
@@ -17,19 +15,15 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     QColor color(255,255,255);
-
     QColor river(0,200,255); //blue
     QColor tree(0,200,13); //green
     QColor rock(40,80,100);
     QColor enemy(250,0,0); //red
-
     newGameColor_ = color;
     river_color_ = river;
     tree_color_ = tree;
     rock_color_ = rock;
-
     enemy_color_ = enemy;
-
     // randomize tree and rock
     srand(time(0));
     createGameGrid();
@@ -111,8 +105,14 @@ void MainWindow::createGameGrid(){
     // make structures
     QColor bridge(100,100,100);
     QColor nuke(250,250,0); //yellow
+    QColor attackPowerUp(250,100,0);
+    QColor healthPowerUp(0,100,50);
+    QColor pointsPowerUp(1,1,1);
     makeRiver();
     makeNuke(nuke);
+    makeAttackPowerUp(attackPowerUp);
+    makeHealthPowerUp(healthPowerUp);
+    makePointsPowerUp(pointsPowerUp);
     makeBridge(bridge);
 
 
@@ -129,16 +129,15 @@ void MainWindow::makeEnemy(int i, int j)
 }
     //-------------------
 
+
 void MainWindow::setPlayer(int x, int y, QColor color){
     cells[y][x]->set_player_status(true);
     cells[y][x]->set_Color(color);
 }
-
         //nuke
 void MainWindow::makeNuke(QColor color){ //one nuke on map ends game
     cells[0][1]->set_Color(color);
     cells[0][1]->set_Nuke(true);
-
 
 }
 
@@ -174,7 +173,6 @@ void MainWindow::makeRock(int i, int j){
     cells[i][j]->set_obstical(true);
 }
 
-
 void MainWindow::nukeGame() //ends the game if player lands on nuke
 {
     QTextEdit* GameEndsByNuke= new QTextEdit();
@@ -184,19 +182,87 @@ void MainWindow::nukeGame() //ends the game if player lands on nuke
     GameEndsByNuke->show();
 }
 
+        //POWER UPS
+void MainWindow::makeAttackPowerUp(QColor color)
+{
+    cells[0][6]->set_Color(color);
+    cells[0][6]->set_attackPowerUp(true);
+
+}
+
+void MainWindow::makeHealthPowerUp(QColor color)
+{
+    cells[8][5]->set_Color(color);
+    cells[8][5]->set_HealthPowerUp(true);
+
+}
+
+void MainWindow::makePointsPowerUp(QColor color)
+{
+    cells[6][4]->set_Color(color);
+    cells[6][4]->set_PtsPowerUp(true);
+
+}
+
 void MainWindow::movePlayer(int option){
     int i = p1_->get_pos_y();
     int j = p1_->get_pos_x();
+    int count1 = 0;
+    int count2 = 0;
+    int count3 = 0;
+    int count4 = 0;
     qDebug() << "player pos = i: " << i << ", j: " << j;
     if(option == 1){  // UP
         if(i != 0 && !cells[i-1][j]->get_obstical_status()){
             cells[i-1][j]->movePlayerUp(p1_);
             cells[i][j]->resetPrevCell();
-               if(cells[i][j]->get_nuke()) //if we land on nuke
-                {
-                    nukeGame();
-                }
 
+            if(cells[i][j]->get_nuke() && count1 == 0) //if we land on nuke
+             {
+                 nukeGame();
+                 count1++;
+                 //end the game
+             }
+            else if(cells[i][j]->get_atkPowerUp() && count2 == 0) //if we land on attack power up
+             {
+                int a = p1_->get_attack();
+                p1_->add_attack(a * 1.5);
+                 //increase player attack
+                QTextEdit* AtkPowerUp= new QTextEdit();
+                AtkPowerUp->setWindowFlags(Qt::Window);
+                AtkPowerUp->setReadOnly(true);
+                AtkPowerUp->append("Attack Power Up picked up! Player Attack Damage is increased by 0.5%");
+                AtkPowerUp->show();
+                count2++;
+                qDebug() << "Attack upgrade picked up.";
+
+             }
+            else if(cells[i][j]->get_HealthPowerUp() && count3 == 0) //if we land on health power up
+            {
+                int p = p1_->get_health();
+                p1_->add_health(p * 1.5);
+                //increase player health
+                QTextEdit* HealthPowerUp= new QTextEdit();
+                HealthPowerUp->setWindowFlags(Qt::Window);
+                HealthPowerUp->setReadOnly(true);
+                HealthPowerUp->append("Health Power Up picked up! Player Health is increased by 0.5%");
+                HealthPowerUp->show();
+                count3++;
+                qDebug() << "Health upgrade picked up";
+
+            }
+            else if(cells[i][j]->get_PtsPowerUp() && count4 == 0) //if we land on points power up
+            {
+                p1_->add_points(100);
+                //increase player pts
+                QTextEdit* PtsPowerUp= new QTextEdit();
+                PtsPowerUp->setWindowFlags(Qt::Window);
+                PtsPowerUp->setReadOnly(true);
+                PtsPowerUp->append("Points Power Up picked up! Player Points are increased by 100");
+                PtsPowerUp->show();
+                count4++;
+                qDebug() << "points upgrade picked up.";
+            }
         }
         else{
             qDebug() << "Cannot move here!";
@@ -206,11 +272,51 @@ void MainWindow::movePlayer(int option){
         if(i != 19 && !cells[i+1][j]->get_obstical_status()){
             cells[i+1][j]->movePlayerDown(p1_);
             cells[i][j]->resetPrevCell();
-            if(cells[i][j]->get_nuke()) //if we land on nuke
+            if(cells[i][j]->get_nuke() && count1 == 0) //if we land on nuke
              {
                  nukeGame();
+                 count1++;
              }
+            else if(cells[i][j]->get_atkPowerUp() && count2 == 0) //if we land on attack power up
+             {
+                int a = p1_->get_attack();
+                p1_->add_attack(a * 1.5);
+                 //increase player attack
+                QTextEdit* AtkPowerUp= new QTextEdit();
+                AtkPowerUp->setWindowFlags(Qt::Window);
+                AtkPowerUp->setReadOnly(true);
+                AtkPowerUp->append("Attack Power Up picked up! Player Attack Damage is increased by 0.5%");
+                AtkPowerUp->show();
+                count2++;
+                            qDebug() << "Attack upgrade picked up.";
+             }
+            else if(cells[i][j]->get_HealthPowerUp() && count3 == 0) //if we land on health power up
+            {
+                int p = p1_->get_health();
+                p1_->add_health(p * 1.5);
+                //increase player health
+                QTextEdit* HealthPowerUp= new QTextEdit();
+                HealthPowerUp->setWindowFlags(Qt::Window);
+                HealthPowerUp->setReadOnly(true);
+                HealthPowerUp->append("Health Power Up picked up! Player Health is increased by 0.5%");
+                HealthPowerUp->show();
+                count3++;
+                      qDebug() << "Health upgrade picked up";
 
+            }
+            else if(cells[i][j]->get_PtsPowerUp() && count4 == 0) //if we land on points power up
+            {
+                p1_->add_points(100);
+                //increase player pts
+                QTextEdit* PtsPowerUp= new QTextEdit();
+                PtsPowerUp->setWindowFlags(Qt::Window);
+                PtsPowerUp->setReadOnly(true);
+                PtsPowerUp->append("Points Power Up picked up! Player Points are increased by 100");
+                PtsPowerUp->show();
+                count4++;
+                         qDebug() << "points upgrade picked up.";
+
+            }
         }
         else{
             qDebug() << "Cannot move here!";
@@ -220,11 +326,53 @@ void MainWindow::movePlayer(int option){
         if(j != 0 && !cells[i][j-1]->get_obstical_status()){
             cells[i][j-1]->movePlayerLeft(p1_);
             cells[i][j]->resetPrevCell();
-            if(cells[i][j]->get_nuke()) //if we land on nuke
+            if(cells[i][j]->get_nuke() && count1 == 0) //if we land on nuke
              {
                  nukeGame();
+                 count1++;
              }
+            if(cells[i][j]->get_atkPowerUp() && count2 == 0) //if we land on attack power up
+             {
+                int a = p1_->get_attack();
+                p1_->add_attack(a * 1.5);
+                 //increase player attack
+                QTextEdit* AtkPowerUp= new QTextEdit();
+                AtkPowerUp->setWindowFlags(Qt::Window);
+                AtkPowerUp->setReadOnly(true);
+                AtkPowerUp->append("Attack Power Up picked up! Player Attack Damage is increased by 0.5%");
+                AtkPowerUp->show();
+                count2++;
+                            qDebug() << "Attack upgrade picked up.";
 
+             }
+            else if(cells[i][j]->get_HealthPowerUp() && count3 == 0) //if we land on health power up
+            {
+                int p = p1_->get_health();
+                p1_->add_health(p * 1.5);
+                //increase player health
+                QTextEdit* HealthPowerUp= new QTextEdit();
+                HealthPowerUp->setWindowFlags(Qt::Window);
+                HealthPowerUp->setReadOnly(true);
+                HealthPowerUp->append("Health Power Up picked up! Player Health is increased by 0.5%");
+                HealthPowerUp->show();
+                count3++;
+                      qDebug() << "Health upgrade picked up";
+
+            }
+            else if(cells[i][j]->get_PtsPowerUp() && count4 == 0) //if we land on points power up
+            {
+                p1_->add_points(100);
+                //increase player points
+
+                QTextEdit* PtsPowerUp= new QTextEdit();
+                PtsPowerUp->setWindowFlags(Qt::Window);
+                PtsPowerUp->setReadOnly(true);
+                PtsPowerUp->append("Points Power Up picked up! Player Points are increased by 100");
+                PtsPowerUp->show();
+                count4++;
+                         qDebug() << "points upgrade picked up.";
+
+            }
         }
         else{
             qDebug() << "Cannot move here!";
@@ -234,17 +382,58 @@ void MainWindow::movePlayer(int option){
         if(j != 19 && !cells[i][j+1]->get_obstical_status()){
             cells[i][j+1]->movePlayerRight(p1_);
             cells[i][j]->resetPrevCell();
-
             if(cells[i][j]->get_nuke()) //if we land on nuke
              {
                  nukeGame();
              }
+            if(cells[i][j]->get_atkPowerUp() && count2 == 0) //if we land on attack power up
+             {
+                int a = p1_->get_attack();
+                p1_->add_attack(a * 1.5);
+                 //increase player attack
+
+                QTextEdit* AtkPowerUp= new QTextEdit();
+                AtkPowerUp->setWindowFlags(Qt::Window);
+                AtkPowerUp->setReadOnly(true);
+                AtkPowerUp->append("Attack Power Up picked up! Player Attack Damage is increased by 0.5%");
+                AtkPowerUp->show();
+                count2++;
+                            qDebug() << "Attack upgrade picked up.";
+
+             }
+            else if(cells[i][j]->get_HealthPowerUp() && count3 == 0) //if we land on health power up
+            {
+                int p = p1_->get_health();
+                p1_->add_health(p * 1.5);
+                //increase player health
+                QTextEdit* HealthPowerUp= new QTextEdit();
+                HealthPowerUp->setWindowFlags(Qt::Window);
+                HealthPowerUp->setReadOnly(true);
+                HealthPowerUp->append("Health Power Up picked up! Player Health is increased by 0.5%");
+                HealthPowerUp->show();
+                count3++;
+                qDebug() << "health power up picked up";
+
+            }
+            else if(cells[i][j]->get_PtsPowerUp() && count4 == 0) //if we land on points power up
+            {
+                p1_->add_points(100);
+                //increase player pts
+                QTextEdit* PtsPowerUp= new QTextEdit();
+                PtsPowerUp->setWindowFlags(Qt::Window);
+                PtsPowerUp->setReadOnly(true);
+                PtsPowerUp->append("Points Power Up picked up! Player Points are increased by 100");
+                PtsPowerUp->show();
+                count4++;
+                qDebug() << "points power up picked up";
+                }
+            }
         }
         else{
             qDebug() << "Cannot move here!";
         }
     }
-}
+
 
 
 // ===== SLOTS =====
@@ -284,6 +473,7 @@ void MainWindow::right_button_clicked() //slot for moving player right
     qDebug() << "Move right";
     movePlayer(4);
 }
+
 
 void MainWindow::on_actionOpen_Rules_triggered()
 {
