@@ -44,6 +44,8 @@ public:
     void makeEnemy(int i, int j);
     bool checkEnemy(int i, int j);
     game* getEnemyCell();
+    void hardcodeEnemy();
+    Enemy* getEnemy();
 
     void checkCastle(game * cell);
     void nukeGame();
@@ -55,7 +57,7 @@ public:
     void enemyDefeated();
     void endGame(Player * p);
     bool getMessageStatus() { return message_active_; };
-    void removeDefeatedEnemy();
+
 
     void setPlayer(int x, int y, QColor color);
     void updatePlayerPositionToFalse(int x, int y, QColor color);
@@ -82,7 +84,7 @@ private slots: // slots for buttons on UI
 
     void playerAttackSlot();
     void enemyAttackSlot();
-
+    void removeEnemySlot(game * item);
     void messageSlot();
     void timerLabelSlot();
 
@@ -109,6 +111,9 @@ private:
 
     Enemy *enemy_spawner_;
     Enemy *curr_enemy_;
+    std::vector<Enemy*> enemies_;
+    int i__, j__;
+
     std::vector<game*> neighbor_cells_;
     bool message_active_;
 

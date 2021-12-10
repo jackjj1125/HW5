@@ -56,8 +56,11 @@ void MainWindow::createGameGrid(){
     cell_height_ = grid_view->frameSize().height() - 3;
     cell_width_ = grid_view->frameSize().width() - 3;
 
-    enemy_spawner_ = new Enemy(20, 20, 40);
-    //curr_enemy_ = NULL;
+    //enemy_spawner_ = new Enemy(20, 20, 40);
+    //enemies_.back() = NULL;
+
+//    Enemy * BanditPrototype = new Bandit(20, 20, 40);
+//    Spawner * banditSpawner = new Spawner(BanditPrototype);
 
     // create cells. these are the gameboard peices
     for(int i = 0; i < 10; i++){
@@ -66,6 +69,7 @@ void MainWindow::createGameGrid(){
             cells[i][j] = item;
             MakeBoard_->addItem(item);
             connect(item, &game::messageSignal, this, &MainWindow::messageSlot);
+            connect(item, &game::removeEnemySignal, this, &MainWindow::removeEnemySlot);
         }
     }
     for(int i = 0; i < 10; i++){
@@ -93,6 +97,7 @@ void MainWindow::createGameGrid(){
     makeRiver();
     makeNuke(nuke);
     makeBridge(bridge);
+    //hardcodeEnemy();  // for testing
 }
 
 void MainWindow::setupPlayers(){
@@ -157,17 +162,26 @@ void MainWindow::restartGame(){
     setupUI();
 }
 
-
-
 // set up enemies
 void MainWindow::makeEnemy(int i, int j){
+    Enemy* bandit = new Enemy(20, 20, 40);
+    enemies_.push_back(bandit);
     cells[i][j]->set_Color(enemy_color_);
-    cells[i][j]->set_enemy(true, enemy_spawner_);
+    cells[i][j]->set_enemy(true);
     cells[i][j]->set_obstical(true);
-    cells[i][j]->getEnemyObject()->set_pos(i, j);
+}
 
-//    QPixmap pic("/path/to/your/image");
-//    ui->gameGraphicsView->setPixmap(pic);
+//void MainWindow::hardcodeEnemy(){
+//    Enemy* bandit = new Enemy(20, 20, 40);
+//    enemies_.push_back(bandit);
+//    cells[7][0]->set_enemy(true);
+//    cells[7][0]->set_obstical(true);
+//    cells[7][0]->set_Color(enemy_color_);
+//    connect(cells[7][0], &game::removeEnemySignal, this, &MainWindow::removeEnemySlot);
+//}
+
+Enemy* MainWindow::getEnemy(){
+    return enemies_.back();
 }
 
 
@@ -268,6 +282,9 @@ std::vector<game*> MainWindow::checkNeigbors(int i, int j){
 
 bool MainWindow::checkEnemy(int i, int j){
     neighbor_cells_ = checkNeigbors(i, j);
+    if(neighbor_cells_.empty()){
+        return false;
+    }
     qDebug() << "neighbors retrieved: "<< neighbor_cells_.size();
     for(int x = 0; x < neighbor_cells_.size(); x++){
         if(neighbor_cells_[x]->get_enemy()){
@@ -306,7 +323,7 @@ int MainWindow::attackLogic(){
     if(p1_->get_health() <= 0){
         return 0;
     }
-    else if(curr_enemy_->get_health() <= 0){
+    else if(enemies_.back()->get_health() <= 0){
         return 1;
     }
     else{
@@ -327,11 +344,11 @@ void MainWindow::movePlayer(int option){
         if(checkEnemy(i-1, j)){
             message_active_ = true;
             cells[i][j]->sendMessage();
-            curr_enemy_ = getEnemyCell()->getEnemyObject();
             attackTimerOn();
         }
         else{
             message_active_ = false;
+            cells[i][j]->sendMessage();
         }
         if(!cells[i-1][j]->get_obstical_status()){
             cells[i-1][j]->movePlayerUp(p1_);
@@ -349,13 +366,12 @@ void MainWindow::movePlayer(int option){
         if(checkEnemy(i+1, j)){
             message_active_ = true;
             cells[i][j]->sendMessage();
-            ui->enemyHealth->setText(QString("Enemy Health: ")+QString::number(curr_enemy_->get_health()) + QString(" (") + QString::number((curr_enemy_->get_health() * 100)/100) +QString("%)" ));
-            curr_enemy_ = getEnemyCell()->getEnemyObject();
             attackTimerOn();
         }
         else{
             message_active_ = false;
-            //curr_enemy_ = nullptr;
+            cells[i][j]->sendMessage();
+
         }
         if(!cells[i+1][j]->get_obstical_status()){
             cells[i+1][j]->movePlayerDown(p1_);
@@ -373,18 +389,16 @@ void MainWindow::movePlayer(int option){
         if(checkEnemy(i, j-1)){
             message_active_ = true;
             cells[i][j]->sendMessage();
-            curr_enemy_ = getEnemyCell()->getEnemyObject();
             attackTimerOn();
         }
         else{
             message_active_ = false;
-            //curr_enemy_ = nullptr;
+            cells[i][j]->sendMessage();
         }
         if(j != 0 && !cells[i][j-1]->get_obstical_status()){
             cells[i][j-1]->movePlayerLeft(p1_);
             cells[i][j]->resetPrevCell();
             checkCastle(cells[i][j-1]);
-
         }
         else{
             qDebug() << "Cannot move here!";
@@ -397,12 +411,11 @@ void MainWindow::movePlayer(int option){
         if(checkEnemy(i, j+1)){
             message_active_ = true;
             cells[i][j]->sendMessage();
-            curr_enemy_ = getEnemyCell()->getEnemyObject();
             attackTimerOn();
         }
         else{
             message_active_ = false;
-            //curr_enemy_ = nullptr;
+            cells[i][j]->sendMessage();
         }
         if(!cells[i][j+1]->get_obstical_status()){
             cells[i][j+1]->movePlayerRight(p1_);
@@ -416,13 +429,14 @@ void MainWindow::movePlayer(int option){
 }
 
 void MainWindow::enemyDefeated(){
-    cells[curr_enemy_->get_i()][curr_enemy_->get_j()]->removeDefeatedEnemy();
-    //delete curr_enemy_;
-    curr_enemy_ = nullptr;
+     qDebug() << "entered MainWindow::enemyDefeated";
+
+    //delete enemies_.back();
+    neighbor_cells_.erase(neighbor_cells_.begin());
     p1_->add_points(100);
     p1_->add_attack(20);
     p1_->add_health(20);
-    //cells[p1_->get_pos_y()][p1_->get_pos_x()]->sendMessage();
+    cells[p1_->get_pos_y()][p1_->get_pos_x()]->sendMessage();
     ui->score->setText(QString("Player Score: ")+QString::number(p1_->get_points()));
     ui->attackLabel->setText(QString("Player Attack: ")+QString::number(p1_->get_attack()));
     ui->health->setText(QString("Player Health: ")+QString::number(p1_->get_health()) + QString(" (") + QString::number((p1_->get_health() * 100)/100) +QString("%)" ));
@@ -485,44 +499,52 @@ void MainWindow::right_button_clicked() //slot for moving player right
 }
 
 void MainWindow::playerAttackSlot(){ // connects to attack button
-    if(curr_enemy_ != nullptr){
-        //qDebug() << "Attack button clicked";
+    if(checkEnemy(p1_->get_pos_y(), p1_->get_pos_x())){
+        qDebug() << "Attack button clicked";
         int status = attackLogic();
         if(status == 1){ // enemy health is 0
+            qDebug() << "entered conditional 1 (enemy dead)";
             attackTimerOff();
-            enemyDefeated();
+            getEnemyCell()->removeDefeatedEnemy();
+            message_active_ = false;
+            getEnemyCell()->sendMessage();
+            return;
         }
         else{
             if(rand() % 10 == 1){
                 qDebug() << "Critical hit!";
-                curr_enemy_->decrease_health(p1_->get_attack() * 2);
+                enemies_.back()->decrease_health(p1_->get_attack() * 2);
             }
             else{
-                curr_enemy_->decrease_health(p1_->get_attack());
+                enemies_.back()->decrease_health(p1_->get_attack());
             }
-            ui->enemyHealth->setText(QString("Enemy Health: ")+QString::number(curr_enemy_->get_health()) + QString(" (") + QString::number((curr_enemy_->get_health() * 100)/100) +QString("%)" ));
+            ui->enemyHealth->setText(QString("Enemy Health: ")+QString::number(enemies_.back()->get_health()) + QString(" (") + QString::number((enemies_.back()->get_health() * 100)/100) +QString("%)" ));
             status = attackLogic();
             if(status == 1){ // enemy health is 0
+                 qDebug() << "entered conditional 2 (enemy dead)";
                 attackTimerOff();
-                enemyDefeated();
+                attackTimerOff();
+                getEnemyCell()->removeDefeatedEnemy();
+                message_active_ = false;
+                getEnemyCell()->sendMessage();
+                return;
             }
         }
     }
 }
 
 void MainWindow::enemyAttackSlot(){ // connects to timer
-    //qDebug() << "enemyAttackSlot";
+    qDebug() << "enemyAttackSlot";
     int status = attackLogic();
     if(status == 0){ // player health is 0
         endGame(p1_);
     }
     if(status == 1){ // enemy health is 0
         attackTimerOff();
-        enemyDefeated();
     }
     else{
         // invoke enemy attack
-        p1_->decrease_health(curr_enemy_->get_attack());
+        p1_->decrease_health(enemies_.back()->get_attack());
         ui->health->setText(QString("Player Health: ")+QString::number(p1_->get_health()) + QString(" (") + QString::number((p1_->get_health() * 100)/100) +QString("%)" ));
         update();
 
@@ -533,15 +555,20 @@ void MainWindow::enemyAttackSlot(){ // connects to timer
         }
         if(status == 1){ // enemy health is 0
             attackTimerOff();
-            enemyDefeated();
         }
     }
+}
+
+void MainWindow::removeEnemySlot(game * item){
+    qDebug() << "removeEnemySlot";
+    enemies_.pop_back();
+    enemyDefeated();
 }
 
 void MainWindow::messageSlot(){
     if(getMessageStatus()){
         ui->messageLabel->setText(QString("*WARNING* Enemy nearby!"));
-        ui->enemyHealth->setText(QString("Enemy Health: ")+QString::number(curr_enemy_->get_health()) + QString(" (") + QString::number((curr_enemy_->get_health() * 100)/100) +QString("%)" ));
+        ui->enemyHealth->setText(QString("Enemy Health: ")+QString::number(enemies_.back()->get_health()) + QString(" (") + QString::number((enemies_.back()->get_health() * 100)/100) +QString("%)" ));
     }
     else{
         ui->enemyHealth->setText(QString(""));

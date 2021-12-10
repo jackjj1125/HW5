@@ -43,11 +43,14 @@ public:
     bool get_castle() { return is_castle_; };
     void set_bridge_status(bool s) { is_bridge_ = s; };
 
+    int get_i_() { return i_;};
+    int get_j_() { return j_;}
 
-
-    void set_enemy(bool e, Enemy *enemy){ is_enemy_ = e; enemy_ = enemy; };
+    void set_enemy(bool e){ is_enemy_ = e;};
     bool get_enemy() { return is_enemy_; };
-    Enemy *getEnemyObject() { return enemy_; };
+//    void set_enemy(bool e, Enemy *enemy){ is_enemy_ = e; enemy_ = enemy; };
+//    bool get_enemy() { return is_enemy_; };
+//    Enemy *getEnemyObject() { return enemy_; };
 
     void sendMessage();
 
@@ -96,7 +99,9 @@ private:
 
     //for enemies
     bool is_enemy_;
-    Enemy *enemy_;
+    int i_;
+    int j_;
+    //Enemy *enemy_;
 
 
 

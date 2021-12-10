@@ -17,6 +17,8 @@ game::game(int x, int y, int width, int height, QColor color){
     is_bridge_ = false;
     is_enemy_ = false;
     is_player_ = false;
+    i_ = y;
+    j_ = x;
 
 }
 
@@ -42,17 +44,19 @@ void game::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 }
 
 void game::removeDefeatedEnemy(){
-    qDebug() << "entered removeDefeatedEnemy";
+    qDebug() << "entered game::removeDefeatedEnemy";
+
     this->set_obstical(false);
-    this->set_Color(color_);
-    this->set_enemy(false, NULL);
+    QColor color(255,255,255);
+    this->set_Color(color);
+    this->set_enemy(false);
     emit removeEnemySignal(this);
     update();
 }
 
 void game::attackPlayer(Player * p, int h){
     p->decrease_health(h);
-    //emit attackSignal(this);
+    emit attackSignal(this);
     update();
 }
 
