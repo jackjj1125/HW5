@@ -23,6 +23,9 @@ MainWindow::MainWindow(QWidget *parent)
     srand(time(0));
 
     // setup board and game elements
+    // final boss
+    Enemy* finalBoss = new Enemy(6000, 200, 10000);
+    enemies_.push_back(finalBoss);
     initTimer();
     setupColors();
     createGameGrid();
@@ -74,37 +77,65 @@ void MainWindow::createGameGrid(){
     }
     for(int i = 0; i < 10; i++){
         for(int j = 0; j < 20; j++){
-            int rn = rand() % 16;
+            int rn = rand() % 33;
             if(j > 5){
-                if(rn == 7){
+                if(rn == 7 || rn == 29){
                     qDebug() << "Random Tree Added!";
                     makeTree(i, j);
                 }
-                if(rn == 2){
+                if(rn == 2 || rn == 24){
                     qDebug() << "Random Rock Added!";
                     makeRock(i, j);
                 }
-                if(rn == 3){
+                if(rn == 3 || rn == 16 ){
+                    int rPower = rand() % 3;
+                    if(rPower == 0){
+                        makeEnemy(i, j);
+                    }
+                    if(rPower == 1){
+                        makeBandit(i, j);
+                    }
+                    if(rPower == 2){
+                        makeWizard(i, j);
+                    }
+
                     qDebug() << "Random Enemy Added!";
-                    makeEnemy(i, j);
+
+                }
+                if(rn == 4){
+                    int rPower = rand() % 3;
+                    if(rPower == 0){
+                        QColor attackPowerUp(205, 204, 153); //
+                        makeAttackPowerUp(i, j, attackPowerUp);
+                    }
+                    if(rPower == 1){
+                        QColor healthPowerUp(204,253,152); //
+                        makeHealthPowerUp(i, j, healthPowerUp);
+
+                    }
+                    if(rPower == 2){
+                        QColor pointsPowerUp(255,255,80); //
+                        makePointsPowerUp(i, j, pointsPowerUp);
+                    }
                 }
             }
         }
     }
     // make structures
-    QColor bridge(100,100,100);
-    QColor nuke(250,250,0); //yellow
+    QColor bridge(145,62,62); // brown
+    QColor nuke(90,80,90); //grey
     makeRiver();
     makeNuke(nuke);
     makeBridge(bridge);
     //hardcodeEnemy();  // for testing
+    power_message_ = false;
 }
 
 void MainWindow::setupPlayers(){
     // init player
-    QColor pColor(100,40,100);
+    QColor pColor(1,1,1);
     player_color_ = pColor;
-    p1_ = new Player(0, 9, 0, 100, 20, pColor, "Player 1");
+    p1_ = new Player(0, 9, 0, 100, 5, pColor, "Player 1");
     setPlayer(0, 9, pColor);
 
     player_health_ = p1_->get_health();
@@ -114,9 +145,9 @@ void MainWindow::setupPlayers(){
 
 void MainWindow::setupUI(){
     // set turn count and population labels to initial state after grid creation
-    ui->score->setText(QString("Player Score: ")+QString::number(player_score_));
-    ui->attackLabel->setText(QString("Player Attack: ")+QString::number(player_attack_));
-    ui->health->setText(QString("Player Health: ")+QString::number(player_health_) + QString(" (") + QString::number((player_health_ * 100)/100) +QString("%)" ));
+    ui->score->setText(QString("Score: ")+QString::number(player_score_));
+    ui->attackLabel->setText(QString("Attack: ")+QString::number(player_attack_));
+    ui->health->setText(QString("Health: ")+QString::number(player_health_) + QString(" (") + QString::number((player_health_ * 100)/100) +QString("%)" ));
     ui->messageLabel->setText("No enemies near you");
     ui->enemyHealth->setText("");
     ui->timerLabel->setText("Time in battle: 0 sec");
@@ -127,14 +158,18 @@ void MainWindow::setupColors(){
     QColor color(255,255,255); // white for empty game tiles
     QColor river(0,200,255); //blue for river
     QColor tree(0,200,13); //green for trees
-    QColor rock(40,80,100); // grey for rock
-    QColor enemy(250,0,0); //red for enemies
+    QColor rock(200,200,200); // grey for rock
+    QColor enemy(255,0,0); //red for enemies
+    QColor bandit(255, 153, 153);
+    QColor wiz(127, 0, 200);
 
     newGameColor_ = color;
     river_color_ = river;
     tree_color_ = tree;
     rock_color_ = rock;
     enemy_color_ = enemy;
+    bandit_color_ = bandit;
+    wizard_color_ = wiz;
 }
 
 void MainWindow::initTimer(){
@@ -164,9 +199,24 @@ void MainWindow::restartGame(){
 
 // set up enemies
 void MainWindow::makeEnemy(int i, int j){
-    Enemy* bandit = new Enemy(20, 20, 40);
+    Enemy* bandit = new Enemy(60, 25, 85);
     enemies_.push_back(bandit);
     cells[i][j]->set_Color(enemy_color_);
+    cells[i][j]->set_enemy(true);
+    cells[i][j]->set_obstical(true);
+}
+
+void MainWindow::makeBandit(int i, int j){
+     Enemy* bandit = new Enemy(20, 20, 40);
+     enemies_.push_back(bandit);
+     cells[i][j]->set_Color(bandit_color_);
+     cells[i][j]->set_enemy(true);
+     cells[i][j]->set_obstical(true);
+ }
+void MainWindow::makeWizard(int i, int j){
+    Enemy* bandit = new Enemy(40, 100, 40);
+    enemies_.push_back(bandit);
+    cells[i][j]->set_Color(wizard_color_);
     cells[i][j]->set_enemy(true);
     cells[i][j]->set_obstical(true);
 }
@@ -184,7 +234,26 @@ Enemy* MainWindow::getEnemy(){
     return enemies_.back();
 }
 
+//POWER UPS
+void MainWindow::makeAttackPowerUp(int i, int j, QColor color)
+{
+    cells[i][j]->set_Color(color);
+    cells[i][j]->set_attackPowerUp(true);
 
+}
+
+void MainWindow::makeHealthPowerUp(int i, int j, QColor color)
+{
+    cells[i][j]->set_Color(color);
+    cells[i][j]->set_HealthPowerUp(true);
+
+}
+void MainWindow::makePointsPowerUp(int i, int j, QColor color)
+    {
+    cells[i][j]->set_Color(color);
+    cells[i][j]->set_PtsPowerUp(true);
+
+}
 void MainWindow::setPlayer(int x, int y, QColor color){
     cells[y][x]->set_player_status(true);
     cells[y][x]->set_Color(color);
@@ -196,7 +265,7 @@ void MainWindow::makeNuke(QColor color){ //one nuke on map ends game
     cells[0][1]->set_castle(true);
 }
 
-void MainWindow::makeBridge(QColor color){
+void MainWindow::makeBridge(QColor color){ // makes bridge cell that lets player cross river
     cells[2][5]->set_Color(color);
     cells[2][5]->set_bridge_status(true);
 }
@@ -332,15 +401,14 @@ int MainWindow::attackLogic(){
 }
 
 void MainWindow::movePlayer(int option){
-    if(start_){
-        attackTimerOff();
-    }
+    attackTimerOff();
     int i = p1_->get_pos_y();
     int j = p1_->get_pos_x();
     if(option == 1){  // UP
         if(i == 0){
             return;
         }
+
         if(checkEnemy(i-1, j)){
             message_active_ = true;
             cells[i][j]->sendMessage();
@@ -354,6 +422,38 @@ void MainWindow::movePlayer(int option){
             cells[i-1][j]->movePlayerUp(p1_);
             cells[i][j]->resetPrevCell();
             checkCastle(cells[i-1][j]);
+            if(cells[i-1][j]->get_atkPowerUp()) //if we land on attack power up
+            {
+                power_message_ = true;
+                cells[i][j]->sendMessage();
+                int a = p1_->get_attack();
+                p1_->add_attack(a * 1.5);
+                ui->attackLabel->setText(QString("Attack: ")+QString::number(p1_->get_attack()) + QString(" (") + QString::number((p1_->get_attack() * 100)/100) +QString("%)" ));
+
+            }
+            else if(cells[i-1][j]->get_HealthPowerUp()) //if we land on health power up
+            {
+                power_message_ = true;
+                cells[i][j]->sendMessage();
+                int p = p1_->get_health();
+                p1_->add_health(p * 1.5);
+                ui->health->setText(QString("Health: ")+QString::number(p1_->get_health()) + QString(" (") + QString::number((p1_->get_health() * 100)/100) +QString("%)" ));
+
+
+            }
+            else if(cells[i-1][j]->get_PtsPowerUp()) //if we land on points power up
+            {
+                power_message_ = true;
+                cells[i][j]->sendMessage();
+                p1_->add_points(100);
+                ui->score->setText(QString("Points: ")+QString::number(p1_->get_points()) + QString(" (") + QString::number((p1_->get_points() * 100)/100) +QString("%)" ));
+
+            }
+            else{
+                power_message_ = false;
+                cells[i][j]->sendMessage();
+            }
+            update();
         }
         else{
             qDebug() << "Cannot move here!";
@@ -377,6 +477,34 @@ void MainWindow::movePlayer(int option){
             cells[i+1][j]->movePlayerDown(p1_);
             cells[i][j]->resetPrevCell();
             checkCastle(cells[i+1][j]);
+            if(cells[i+1][j]->get_atkPowerUp()) //if we land on attack power up
+            {
+                power_message_ = true;
+                int a = p1_->get_attack();
+                p1_->add_attack(a * 1.5);
+                ui->attackLabel->setText(QString("Attack: ")+QString::number(p1_->get_attack()) + QString(" (") + QString::number((p1_->get_attack() * 100)/100) +QString("%)" ));
+            }
+            else if(cells[i+1][j]->get_HealthPowerUp()) //if we land on health power up
+            {
+                power_message_ = true;
+                int p = p1_->get_health();
+                p1_->add_health(p * 1.5);
+                ui->health->setText(QString("Health: ")+QString::number(p1_->get_health()) + QString(" (") + QString::number((p1_->get_health() * 100)/100) +QString("%)" ));
+                update();
+
+            }
+            else if(cells[i+1][j]->get_PtsPowerUp()) //if we land on points power up
+            {
+                power_message_ = true;
+                p1_->add_points(100);
+                ui->score->setText(QString("Points: ")+QString::number(p1_->get_points()) + QString(" (") + QString::number((p1_->get_points() * 100)/100) +QString("%)" ));
+
+            }
+            else{
+                power_message_ = false;
+            }
+            cells[i][j]->sendMessage();
+            update();
         }
         else{
             qDebug() << "Cannot move here!";
@@ -399,6 +527,36 @@ void MainWindow::movePlayer(int option){
             cells[i][j-1]->movePlayerLeft(p1_);
             cells[i][j]->resetPrevCell();
             checkCastle(cells[i][j-1]);
+            if(cells[i][j-1]->get_atkPowerUp()) //if we land on attack power up
+            {
+                power_message_ = true;
+                int a = p1_->get_attack();
+                p1_->add_attack(a * 1.5);
+                ui->attackLabel->setText(QString("Attack: ")+QString::number(p1_->get_attack()) + QString(" (") + QString::number((p1_->get_attack() * 100)/100) +QString("%)" ));
+
+            }
+            else if(cells[i][j-1]->get_HealthPowerUp()) //if we land on health power up
+            {
+                power_message_ = true;
+                int p = p1_->get_health();
+                p1_->add_health(p * 1.5);
+                //increase player health
+                ui->health->setText(QString("Health: ")+QString::number(p1_->get_health()) + QString(" (") + QString::number((p1_->get_health() * 100)/100) +QString("%)" ));
+
+
+            }
+            else if(cells[i][j-1]->get_PtsPowerUp()) //if we land on points power up
+            {
+                power_message_ = true;
+                p1_->add_points(100);
+                ui->score->setText(QString("Points: ")+QString::number(p1_->get_points()) + QString(" (") + QString::number((p1_->get_points() * 100)/100) +QString("%)" ));
+
+            }
+            else{
+                power_message_ = false;
+            }
+            cells[i][j]->sendMessage();
+            update();
         }
         else{
             qDebug() << "Cannot move here!";
@@ -421,12 +579,45 @@ void MainWindow::movePlayer(int option){
             cells[i][j+1]->movePlayerRight(p1_);
             cells[i][j]->resetPrevCell();
             checkCastle(cells[i][j+1]);
-        }
-        else{
-            qDebug() << "Cannot move here!";
+            if(cells[i][j+1]->get_atkPowerUp()) //if we land on attack power up
+            {
+                power_message_ = true;
+                int a = p1_->get_attack();
+                p1_->add_attack(a * 1.5);
+                 //increase player attack
+                ui->attackLabel->setText(QString("Attack: ")+QString::number(p1_->get_attack()) + QString(" (") + QString::number((p1_->get_attack() * 100)/100) +QString("%)" ));
+
+
+            }
+            else if(cells[i][j+1]->get_HealthPowerUp()) //if we land on health power up
+            {
+                power_message_ = true;
+                int p = p1_->get_health();
+                p1_->add_health(p * 1.5);
+                ui->health->setText(QString("Health: ")+QString::number(p1_->get_health()) + QString(" (") + QString::number((p1_->get_health() * 100)/100) +QString("%)" ));
+
+            }
+            else if(cells[i][j+1]->get_PtsPowerUp()) //if we land on points power up
+            {
+                power_message_ = true;
+                p1_->add_points(100);
+                //increase player pts
+                ui->score->setText(QString("Points: ")+QString::number(p1_->get_points()) + QString(" (") + QString::number((p1_->get_points() * 100)/100) +QString("%)" ));
+
+            }
+            else{
+                qDebug() << " power_message_ = false!";
+                power_message_ = false;
+            }
+            cells[i][j]->sendMessage();
+            update();
         }
     }
+    else{
+        qDebug() << "Cannot move here!";
+    }
 }
+
 
 void MainWindow::enemyDefeated(){
      qDebug() << "entered MainWindow::enemyDefeated";
@@ -440,11 +631,6 @@ void MainWindow::enemyDefeated(){
     ui->score->setText(QString("Player Score: ")+QString::number(p1_->get_points()));
     ui->attackLabel->setText(QString("Player Attack: ")+QString::number(p1_->get_attack()));
     ui->health->setText(QString("Player Health: ")+QString::number(p1_->get_health()) + QString(" (") + QString::number((p1_->get_health() * 100)/100) +QString("%)" ));
-//    QTextEdit* enemyDefeated= new QTextEdit();
-//    enemyDefeated->setWindowFlags(Qt::Window);
-//    enemyDefeated->setReadOnly(true);
-//    enemyDefeated->append("You have defeated an enemy! You are rewarded with 100 points, and an additional health and attack bonus.");
-//    enemyDefeated->show();
 }
 
 void MainWindow::endGame(Player *p){
@@ -545,7 +731,7 @@ void MainWindow::enemyAttackSlot(){ // connects to timer
     else{
         // invoke enemy attack
         p1_->decrease_health(enemies_.back()->get_attack());
-        ui->health->setText(QString("Player Health: ")+QString::number(p1_->get_health()) + QString(" (") + QString::number((p1_->get_health() * 100)/100) +QString("%)" ));
+        ui->health->setText(QString("Health: ")+QString::number(p1_->get_health()) + QString(" (") + QString::number((p1_->get_health() * 100)/100) +QString("%)" ));
         update();
 
         // check if player or enemy defeated again after attack
@@ -571,11 +757,17 @@ void MainWindow::messageSlot(){
         ui->enemyHealth->setText(QString("Enemy Health: ")+QString::number(enemies_.back()->get_health()) + QString(" (") + QString::number((enemies_.back()->get_health() * 100)/100) +QString("%)" ));
     }
     else{
+        if(get_power_message()){
+            ui->messageLabel->setText(QString("POWER UP! You have aquired a ") + QString("Bonus!"));
+        }
+        else{
+            ui->messageLabel->setText("No enemies near you");
+        }
         ui->enemyHealth->setText(QString(""));
-        ui->messageLabel->setText("No enemies near you");
     }
 
 }
+
 void MainWindow::timerLabelSlot(){
     time_elapsed_++;
     ui->timerLabel->setText(QString("Time in battle: ") + QString::number(time_elapsed_) + QString(" sec") );

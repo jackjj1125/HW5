@@ -19,6 +19,9 @@ game::game(int x, int y, int width, int height, QColor color){
     is_player_ = false;
     i_ = y;
     j_ = x;
+    is_ATK_ = false;
+    is_HEALTH_ = false;
+    is_PTS_ = false;
 
 }
 
@@ -68,7 +71,7 @@ void game::sendMessage(){
 void game::resetPrevCell(){
     this->set_player_status(false);
     if(is_bridge_){
-        QColor color(100,100,100);
+        QColor color(165,42,42);
         this->set_Color(color);
     }
     else{
@@ -83,7 +86,7 @@ void game::movePlayerUp(Player * p){
     // move player up
     p->move_up();
     this->set_player_status(true);
-    QColor pColor(100,40,100);
+    QColor pColor(1,1,1);
     this->set_Color(pColor);
 
     emit moveUp(this);
@@ -93,7 +96,7 @@ void game::movePlayerUp(Player * p){
 void game::movePlayerDown(Player * p){
     p->move_down();
     this->set_player_status(true);
-    QColor pColor(100,40,100);
+    QColor pColor(1,1,1);
     this->set_Color(pColor);
 
     emit moveDown(this);
@@ -102,7 +105,7 @@ void game::movePlayerDown(Player * p){
 void game::movePlayerLeft(Player * p){
     p->move_left();
     this->set_player_status(true);
-    QColor pColor(100,40,100);
+    QColor pColor(1,1,1);
     this->set_Color(pColor);
 
     emit moveLeft(this);
@@ -111,7 +114,7 @@ void game::movePlayerLeft(Player * p){
 void game::movePlayerRight(Player * p){
     p->move_right();
     this->set_player_status(true);
-    QColor pColor(100,40,100);
+    QColor pColor(1,1,1);
     this->set_Color(pColor);
 
     emit moveRight(this);
