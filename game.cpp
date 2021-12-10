@@ -15,7 +15,10 @@ game::game(int x, int y, int width, int height, QColor color){
     is_obstical_ = false;
     is_castle_ = false;
     is_bridge_ = false;
+    is_enemy_ = false;
     is_player_ = false;
+    i_ = y;
+    j_ = x;
 
 }
 
@@ -38,6 +41,28 @@ void game::paint(QPainter *painter, const QStyleOptionGraphicsItem *item, QWidge
 
 void game::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 
+}
+
+void game::removeDefeatedEnemy(){
+    qDebug() << "entered game::removeDefeatedEnemy";
+
+    this->set_obstical(false);
+    QColor color(255,255,255);
+    this->set_Color(color);
+    this->set_enemy(false);
+    emit removeEnemySignal(this);
+    update();
+}
+
+void game::attackPlayer(Player * p, int h){
+    p->decrease_health(h);
+    emit attackSignal(this);
+    update();
+}
+
+void game::sendMessage(){
+    emit messageSignal(this);
+    update();
 }
 
 void game::resetPrevCell(){

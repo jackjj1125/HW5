@@ -22,7 +22,6 @@ Player::Player(int x, int y, int points, int health, int attack, QColor color, s
 
 void Player::move_up(){
     pos_.y--;
-    //emit moveUp(this);
 }
 void Player::move_down(){
     pos_.y++;

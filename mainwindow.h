@@ -4,8 +4,15 @@
 #include <QMainWindow>
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QElapsedTimer>
+#include <QTimer>
 #include <vector>
+#include <QTextEdit>
+
 #include "game.h"
+#include "player.h"
+#include "enemy.h"
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -20,12 +27,37 @@ public:
     ~MainWindow();
 
     void createGameGrid();
+    void setupUI();
+    void setupPlayers();
+    void setupColors();
 
-    void makeCastle(QColor color);
+    void restartGame();
+
+
+    void makeNuke(QColor color);
+
     void makeBridge(QColor color);
     void makeRiver();
     void makeTree(int i, int j);
     void makeRock(int i, int j);
+    void initTimer();
+    void makeEnemy(int i, int j);
+    bool checkEnemy(int i, int j);
+    game* getEnemyCell();
+    void hardcodeEnemy();
+    Enemy* getEnemy();
+
+    void checkCastle(game * cell);
+    void nukeGame();
+
+    int attackLogic();
+    std::vector<game*> checkNeigbors(int i, int j);
+    void attackTimerOn();
+    void attackTimerOff();
+    void enemyDefeated();
+    void endGame(Player * p);
+    bool getMessageStatus() { return message_active_; };
+
 
     void setPlayer(int x, int y, QColor color);
     void updatePlayerPositionToFalse(int x, int y, QColor color);
@@ -46,6 +78,16 @@ private slots: // slots for buttons on UI
 
     void right_button_clicked();
 
+    void on_actionOpen_Rules_triggered();
+
+    void on_pushButton_clicked();
+
+    void playerAttackSlot();
+    void enemyAttackSlot();
+    void removeEnemySlot(game * item);
+    void messageSlot();
+    void timerLabelSlot();
+
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
@@ -58,15 +100,29 @@ private:
     int player_score_;
     int player_attack_;
 
+    QTimer *timer;
+    int time_elapsed_;
+    bool start_;
+
     game * cells[10][20];
 
     Player *p1_;
     Player *p2_;
+
+    Enemy *enemy_spawner_;
+    Enemy *curr_enemy_;
+    std::vector<Enemy*> enemies_;
+    int i__, j__;
+
+    std::vector<game*> neighbor_cells_;
+    bool message_active_;
 
     QColor newGameColor_;
     QColor player_color_;
     QColor river_color_;
     QColor rock_color_;
     QColor tree_color_;
+    QColor enemy_color_;
+
 };
 #endif // MAINWINDOW_H

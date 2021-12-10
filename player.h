@@ -35,7 +35,7 @@ public:
     void add_attack(int a) { attack_ += a; };
     void add_health(int h) { health_ += h; };
 
-    void decrease_health(int h);
+    void decrease_health(int h) {health_ -= h; };
 
     int get_points() { return points_; };
     int get_attack() { return attack_; };
