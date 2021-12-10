@@ -26,6 +26,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    // set up game and UI
     void createGameGrid();
     void setupUI();
     void setupPlayers();
@@ -33,34 +34,58 @@ public:
 
     void restartGame();
 
-
+    // create castle/nuke that ends game
     void makeNuke(QColor color);
 
+    // these create powerup on board
+    void makeAttackPowerUp(int i, int j, QColor color);
+    void makeHealthPowerUp(int i, int j, QColor color);
+    void makePointsPowerUp(int i, int j, QColor color);
+
+    // set up obsticals
     void makeBridge(QColor color);
     void makeRiver();
     void makeTree(int i, int j);
     void makeRock(int i, int j);
+
+    // init timer
     void initTimer();
+
+    // these create different enemy types
     void makeEnemy(int i, int j);
+    void makeBandit(int i, int j);
+    void makeWizard(int i, int j);
+
+    // enemy setters and getters
     bool checkEnemy(int i, int j);
     game* getEnemyCell();
-    void hardcodeEnemy();
     Enemy* getEnemy();
 
+    // ** castle and nuke are the same thing**
+    // sets castle/nuke on gameboard
     void checkCastle(game * cell);
     void nukeGame();
 
-    int attackLogic();
+// battle logic +++++++++++
+    // check neighbor cells for enemies
     std::vector<game*> checkNeigbors(int i, int j);
+
+    // enemy attack timer on/off
     void attackTimerOn();
     void attackTimerOff();
+    int attackLogic();  // check enemy and player health
     void enemyDefeated();
-    void endGame(Player * p);
+    void endGame(Player * p); // end game if player dies
+
+    // send messages (close to enemy or power-up aquired
     bool getMessageStatus() { return message_active_; };
+    bool get_power_message() { return power_message_;};
 
-
+    // create player
     void setPlayer(int x, int y, QColor color);
+    // reset prev cell
     void updatePlayerPositionToFalse(int x, int y, QColor color);
+    // move player
     void movePlayer(int option);
 
 
@@ -87,6 +112,7 @@ private slots: // slots for buttons on UI
     void removeEnemySlot(game * item);
     void messageSlot();
     void timerLabelSlot();
+
 
 private:
     Ui::MainWindow *ui;
@@ -116,6 +142,7 @@ private:
 
     std::vector<game*> neighbor_cells_;
     bool message_active_;
+    bool power_message_;
 
     QColor newGameColor_;
     QColor player_color_;
@@ -123,6 +150,8 @@ private:
     QColor rock_color_;
     QColor tree_color_;
     QColor enemy_color_;
+    QColor bandit_color_;
+    QColor wizard_color_;
 
 };
 #endif // MAINWINDOW_H

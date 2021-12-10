@@ -33,9 +33,11 @@ public:
     QColor get_color() { return color_; }; //getter for color of cell
     void set_Color(QColor color) { color_ = color; }; //setter for color of cell(handles color logic)
 
+    // game board cell status
     void set_player_status(bool status) { is_player_ = status; };
     bool get_player_status() { return is_player_; };
 
+    // flag for obsticals --> river, rock, or tree
     void set_obstical(bool status){ is_obstical_ = status; };
     bool get_obstical_status(){ return is_obstical_; };
 
@@ -43,25 +45,40 @@ public:
     bool get_castle() { return is_castle_; };
     void set_bridge_status(bool s) { is_bridge_ = s; };
 
+    // cell indices on gameboard
     int get_i_() { return i_;};
     int get_j_() { return j_;}
 
+    // enemy flag setters and getters
     void set_enemy(bool e){ is_enemy_ = e;};
     bool get_enemy() { return is_enemy_; };
-//    void set_enemy(bool e, Enemy *enemy){ is_enemy_ = e; enemy_ = enemy; };
-//    bool get_enemy() { return is_enemy_; };
-//    Enemy *getEnemyObject() { return enemy_; };
 
+    //send enemy or bonus message to UI
     void sendMessage();
 
+    // set previous cell to white
     void resetPrevCell();
+
+    // move player methods
     void movePlayerUp(Player * p);
     void movePlayerDown(Player * p);
     void movePlayerLeft(Player * p);
     void movePlayerRight(Player * p);
+
+    // enemy encounter methods
     void attackEnemy(Enemy * e);
     void attackPlayer(Player * p, int h);
     void removeDefeatedEnemy();
+
+    // Power up methods
+    void set_attackPowerUp(bool a) {is_ATK_ = a;};
+    bool get_atkPowerUp(){return is_ATK_;};
+
+    void set_HealthPowerUp(bool h){is_HEALTH_ = h;};
+    bool get_HealthPowerUp(){return is_HEALTH_;};
+
+    void set_PtsPowerUp(bool p){is_PTS_ = p;};
+    bool get_PtsPowerUp(){return is_PTS_;};
 
 // signals for preforming game logic
 signals:
@@ -74,6 +91,7 @@ signals:
     void attackSignal(game * item); // emitted when enemy attacks
     void removeEnemySignal(game * item);
     void messageSignal(game * item);
+    //void messagePowerSignal(game * item);
 
 
 protected:
@@ -103,7 +121,9 @@ private:
     int j_;
     //Enemy *enemy_;
 
-
+    bool is_ATK_;
+    bool is_HEALTH_;
+    bool is_PTS_;
 
 };
 
